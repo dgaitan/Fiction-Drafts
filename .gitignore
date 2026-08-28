@@ -1,0 +1,65 @@
+# ---------------------------------------------------------------- dependencies
+# Both are reproducible from the committed lockfiles. Action Scheduler is a
+# composer dependency (never WooCommerce's copy), so a checkout is not runnable
+# until `composer install --no-dev` has been run — see readme.txt.
+/vendor/
+/node_modules/
+
+# --------------------------------------------------------------- build output
+# Compiled by `bun run build` from assets/app. Regenerated, never edited.
+/build/
+
+# ------------------------------------------------------------ release artefacts
+/dist/
+/fiction-drafts.zip
+*.zip
+
+# ------------------------------------------------------------- tooling caches
+.phpunit.result.cache
+.phpunit.cache/
+.phpcs-cache
+.phpstan.cache/
+/coverage/
+/.php-cs-fixer.cache
+
+# --------------------------------------------------- local tool config overrides
+# The .dist files are the committed contract; these are per-machine overrides
+# that must never change the gate for everyone else.
+/phpcs.xml
+/phpunit.xml
+/phpstan.neon
+
+# ------------------------------------------------------------- plugin runtime
+# Defensive: the storage directory normally lives in wp-content, but a
+# misconfigured base must never turn an archive of the whole site into a commit.
+/fiction-drafts-*/
+*.sql
+*.sql.gz
+
+# -------------------------------------------------------------------- secrets
+.env
+.env.*
+*.pem
+*.key
+auth.json
+
+# ------------------------------------------------------------------------- os
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+
+# --------------------------------------------------------------------- editors
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# ---------------------------------------------------------------------- logs
+*.log
+debug.log

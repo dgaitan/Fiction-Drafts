@@ -1,0 +1,20 @@
+// Design tokens for the Fiction Drafts admin SPA.
+// Every colour, space, and type value belongs here — never inline in a component.
+
+$fd-color-text: #1e1e1e;
+$fd-color-muted: #757575;
+$fd-color-surface: #fff;
+$fd-color-surface-alt: #f6f7f7;
+$fd-color-border: #dcdcde;
+$fd-color-accent: #2271b1;
+$fd-color-warning: #bd8600;
+$fd-color-danger: #b32d2e;
+
+$fd-space-xs: 4px;
+$fd-space-sm: 8px;
+$fd-space-md: 16px;
+$fd-space-lg: 24px;
+
+$fd-radius: 4px;
+$fd-max-width: 880px;
+$fd-bar-height: 20px;

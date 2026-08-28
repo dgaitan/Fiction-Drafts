@@ -1,0 +1,19 @@
+parameters:
+    level: 6
+    paths:
+        - fiction-drafts.php
+        - uninstall.php
+        - src/
+    excludePaths:
+        - vendor/
+    # Action Scheduler is vendored, not autoloaded by Composer's classmap in a
+    # way PHPStan follows, so its as_*() functions are pointed at explicitly.
+    scanFiles:
+        - vendor/woocommerce/action-scheduler/functions.php
+        - vendor/woocommerce/action-scheduler/classes/abstracts/ActionScheduler.php
+    bootstrapFiles:
+        - tests/bootstrap-stubs.php
+    # WordPress function stubs come from szepeviktor/phpstan-wordpress,
+    # auto-registered via phpstan/extension-installer.
+    checkMissingIterableValueType: false
+    reportUnmatchedIgnoredErrors: false

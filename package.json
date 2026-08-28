@@ -1,0 +1,30 @@
+{
+	"name": "fiction-drafts",
+	"version": "0.1.0",
+	"description": "React admin SPA for the Fiction Drafts plugin.",
+	"private": true,
+	"scripts": {
+		"build": "wp-scripts build --source-path=assets/app",
+		"start": "wp-scripts start --source-path=assets/app",
+		"lint:js": "wp-scripts lint-js assets/app",
+		"lint:style": "wp-scripts lint-style",
+		"format": "wp-scripts format",
+		"packages-update": "wp-scripts packages-update"
+	},
+	"main": "build/index.js",
+	"dependencies": {
+		"@tanstack/react-query": "^5.0.0",
+		"@wordpress/api-fetch": "*",
+		"@wordpress/components": "*",
+		"@wordpress/element": "*",
+		"@wordpress/i18n": "*",
+		"react-router-dom": "^6.0.0"
+	},
+	"devDependencies": {
+		"@wordpress/eslint-plugin": "*",
+		"@wordpress/scripts": "*"
+	},
+	"wp-scripts": {
+		"output-path": "build"
+	}
+}

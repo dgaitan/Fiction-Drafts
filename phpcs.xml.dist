@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<ruleset name="Fiction Drafts">
+    <description>WordPress Coding Standards for the Fiction Drafts plugin, tailored for a PSR-4 / modern-PHP codebase.</description>
+
+    <!-- Scan these paths. -->
+    <file>fiction-drafts.php</file>
+    <file>uninstall.php</file>
+    <file>src/</file>
+    <file>tests/</file>
+
+    <!-- Exclude third-party code and build artifacts. -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/build/*</exclude-pattern>
+
+    <!--
+        tests/Harness/ holds standalone acceptance scripts that deliberately
+        redeclare WordPress core functions so a bundled library can be booted
+        without WordPress present.  They are run directly with `php`, never
+        loaded by the plugin or collected by PHPUnit, so the plugin's coding
+        standard does not apply to them.
+    -->
+    <exclude-pattern>tests/Harness/*</exclude-pattern>
+
+    <!--
+        Apply WordPress + extras rulesets.
+
+        All security-relevant sniffs are retained (output escaping, input
+        sanitization, prepared SQL, nonce verification, capability checks,
+        global prefixing).  The sniffs excluded below conflict with this
+        project's documented conventions: PSR-4 PascalCase filenames, camelCase
+        method names defined by the contracts, and the slash-namespaced
+        extension hooks (fiction_drafts/stages).
+    -->
+    <rule ref="WordPress">
+        <!-- PSR-4 autoloading uses PascalCase file names (Stage.php), not class-stage.php. -->
+        <exclude name="WordPress.Files.FileName"/>
+        <!-- The architecture uses camelCase methods declared by the Stage/ArchiveWriter contracts. -->
+        <exclude name="WordPress.NamingConventions.ValidFunctionName"/>
+        <!-- Matching camelCase is used for typed properties and locals (e.g. $jobUuid, $entryName). -->
+        <exclude name="WordPress.NamingConventions.ValidVariableName"/>
+        <!-- Extension hooks are deliberately slash-namespaced, e.g. fiction_drafts/stages. -->
+        <exclude name="WordPress.NamingConventions.ValidHookName"/>
+        <!-- Exception messages are developer/log text, not user-facing output; escaping them is wrong. -->
+        <exclude name="WordPress.Security.EscapeOutput.ExceptionNotEscaped"/>
+        <!-- This codebase standardises on short array syntax (see Generic.Arrays.DisallowLongArraySyntax below). -->
+        <exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+    </rule>
+
+    <rule ref="WordPress-Extra">
+        <exclude name="WordPress.Files.FileName"/>
+        <exclude name="WordPress.NamingConventions.ValidFunctionName"/>
+        <exclude name="WordPress.NamingConventions.ValidVariableName"/>
+        <exclude name="WordPress.NamingConventions.ValidHookName"/>
+        <exclude name="WordPress.Security.EscapeOutput.ExceptionNotEscaped"/>
+        <exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+    </rule>
+
+    <!--
+        Doc-comment sniffs disabled: this codebase documents types via PHP 8.1
+        typed signatures rather than mandatory PHPDoc blocks on every element.
+    -->
+    <rule ref="Squiz.Commenting.FileComment"><severity>0</severity></rule>
+    <rule ref="Squiz.Commenting.ClassComment"><severity>0</severity></rule>
+    <rule ref="Squiz.Commenting.FunctionComment"><severity>0</severity></rule>
+    <rule ref="Squiz.Commenting.VariableComment"><severity>0</severity></rule>
+    <rule ref="Generic.Commenting.DocComment"><severity>0</severity></rule>
+
+    <!-- Interface conformance requires some unused parameters. -->
+    <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter"><severity>0</severity></rule>
+
+    <!-- Scaffolding TODO comments reference future sprints deliberately. -->
+    <rule ref="Squiz.PHP.CommentedOutCode"><severity>0</severity></rule>
+
+    <!-- Test stubs legitimately re-declare WordPress functions and use WP param names. -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+    <rule ref="Universal.NamingConventions.NoReservedKeywordParameterNames">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.WP.GlobalVariablesOverride">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+    <!-- Unit tests run without WordPress, so WP_Filesystem alternatives are unavailable. -->
+    <rule ref="WordPress.WP.AlternativeFunctions">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+    <rule ref="Generic.Files.OneObjectStructurePerFile">
+        <exclude-pattern>tests/stubs/*</exclude-pattern>
+    </rule>
+    <rule ref="Universal.Files.SeparateFunctionsFromOO">
+        <exclude-pattern>tests/stubs/*</exclude-pattern>
+    </rule>
+
+    <!-- PHP version targeting. -->
+    <config name="testVersion" value="8.1-"/>
+
+    <!-- Plugin-specific text domain. -->
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="fiction-drafts"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Namespace prefix for all globals. -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="FictionDrafts"/>
+                <element value="fiction_drafts"/>
+                <element value="FICTION_DRAFTS"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Prefer short array syntax. -->
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+</ruleset>
