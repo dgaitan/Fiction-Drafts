@@ -788,12 +788,12 @@ client renders handed down from PHP rather than restated in JSX, `composer check
 
 **The readme tells the truth**
 
-- [x] ISC-540: `readme.txt` documents the download link as capability-checked, single-use, and five minutes long
-- [x] ISC-541: `readme.txt` states that `.htaccess` protects Apache hosts only and that nginx ignores it
-- [x] ISC-542: `readme.txt` documents `FICTION_DRAFTS_STORAGE_DIR` as the strongest option
-- [x] ISC-543: `readme.txt` documents `wp action-scheduler run` as the manual queue nudge
-- [x] ISC-544: `readme.txt` states that `wp-config.php` is excluded by default and what including it exposes
-- [x] ISC-545: `readme.txt` states that a backup contains every user's password hash even without `wp-config.php`
+- [x] ISC-540: `README.md` documents the download link as capability-checked, single-use, and five minutes long
+- [x] ISC-541: `README.md` states that `.htaccess` protects Apache hosts only and that nginx ignores it
+- [x] ISC-542: `README.md` documents `FICTION_DRAFTS_STORAGE_DIR` as the strongest option
+- [x] ISC-543: `README.md` documents `wp action-scheduler run` as the manual queue nudge
+- [x] ISC-544: `README.md` states that `wp-config.php` is excluded by default and what including it exposes
+- [x] ISC-545: `README.md` states that a backup contains every user's password hash even without `wp-config.php`
 - [x] ISC-546: on this nginx instance, a direct URL to a volume while logged out is measured, and the readme describes what was measured rather than what was hoped
 
 **The §10 review pass**
@@ -971,6 +971,20 @@ client renders handed down from PHP rather than restated in JSX, `composer check
 | SecurityReviewPass | readme rewrite plus the §10 control-by-control walk | satisfies: [ISC-536..547, ISC-550..552] | depends_on: [DownloadHandler] | parallelizable: false |
 
 ## Decisions
+
+### 2026-08-28 — readme.txt becomes README.md
+
+The WordPress.org plugin directory parses `readme.txt` in its own format and nothing else,
+so dropping it forfeits a wp.org listing until it is regenerated. Traded deliberately: this
+repository is the source of truth and its front page is GitHub, where `readme.txt` renders as
+an unformatted wall of text. Every claim ISC-540..545 assert was carried across verbatim and
+re-verified against `README.md`, so the criteria still bind — they now name the file that
+exists. A wp.org release, if it happens, generates `readme.txt` from `README.md` at package
+time rather than maintaining two documents by hand.
+
+Added `CLAUDE.md`: what the plugin is, the five invariants that are decisions rather than
+preferences, the architecture map, and the three testing habits each learned from a real
+defect. Its purpose is to make the next session's first hour unnecessary.
 
 ### 2026-08-28 — Sprint 6
 
