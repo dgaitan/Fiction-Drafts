@@ -5,6 +5,7 @@
 	"private": true,
 	"scripts": {
 		"build": "wp-scripts build --source-path=assets/app",
+		"package": "bun tools/package.ts",
 		"start": "wp-scripts start --source-path=assets/app",
 		"lint:js": "wp-scripts lint-js assets/app",
 		"lint:style": "wp-scripts lint-style",

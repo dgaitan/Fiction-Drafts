@@ -41,6 +41,7 @@
 		"lint-fix": "phpcbf --standard=phpcs.xml.dist",
 		"analyse": "phpstan analyse --configuration=phpstan.neon.dist --no-progress --memory-limit=1G",
 		"test": "phpunit --configuration=phpunit.xml.dist",
+		"package": "bun tools/package.ts",
 		"check": [
 			"@lint",
 			"@analyse",

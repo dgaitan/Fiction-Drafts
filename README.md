@@ -17,7 +17,15 @@ Fiction Drafts copies your site — database, files, or both — into one or mor
 
 ## Install
 
-This repository is the source, not a distributable build. `vendor/` and `build/` are not committed.
+### From a release zip
+
+Download `fiction-drafts-<version>.zip` and install it the ordinary way: **Plugins → Add New → Upload Plugin → Activate**. The archive is self-contained — the Composer autoloader, the bundled Action Scheduler, and the compiled admin bundle are all inside it, so nothing needs to be built on the server.
+
+Build one yourself with `bun run package`; see [Building a release zip](#building-a-release-zip).
+
+### From source
+
+This repository is the source, not a distributable build. `vendor/` and `build/` are deliberately not committed, so a plain clone dropped into `wp-content/plugins/` will activate and then do nothing — there is no autoloader and no admin bundle until you produce them.
 
 ```bash
 git clone git@github.com:dgaitan/Fiction-Drafts.git fiction-drafts
@@ -26,7 +34,7 @@ composer install --no-dev   # Action Scheduler and the autoloader
 bun install && bun run build   # the admin screen
 ```
 
-Drop the directory in `wp-content/plugins/` and activate. Activation generates the storage directory and its random suffix.
+Then drop the directory in `wp-content/plugins/` and activate. Activation generates the storage directory and its random suffix.
 
 ## Use
 
@@ -113,11 +121,33 @@ composer lint       # phpcs
 composer analyse    # phpstan level 6
 bun run start       # watch the admin screen
 bun run lint:js
+bun run package     # build dist/fiction-drafts-<version>.zip
 ```
 
 Standards: PHP 8.1, `declare(strict_types=1)`, PSR-4 `FictionDrafts\` → `src/`, WordPress + WordPress-Extra coding standards, PHPStan level 6.
 
 See [CLAUDE.md](CLAUDE.md) for the architecture and the invariants that must not be broken, and [ISA.md](ISA.md) for the criteria each release was verified against.
+
+### Building a release zip
+
+```bash
+bun run package                    # or: composer package
+bun run package -- --skip-build    # reuse the existing build/ output
+bun run package -- --keep-staging  # leave dist/staging/ to inspect
+bun run package -- --out ./release
+```
+
+Writes `dist/fiction-drafts-<version>.zip` — one top-level `fiction-drafts/` directory, which is the folder name WordPress will install it as.
+
+Three things about how it works are deliberate:
+
+- **It never writes to your working tree.** The release needs `composer install --no-dev`; the repository needs phpcs, phpstan and phpunit. Installing in place would silently disarm `composer check` for whoever cut the release. The plugin is copied to `dist/staging/` and Composer runs there instead.
+- **What ships is an allow-list, not an ignore-list.** An ignore-list fails open, and this is a plugin whose archives contain the site's secrets — a stray `.sql` or `.env` in the plugin root must not be able to ride along by default.
+- **The checks read the finished zip, not the staging directory.** Verifying the staging directory only proves the copy step agreed with itself. The packer re-opens the archive and compares it against the repository: every `src/` PHP file accounted for, the autoloader and Action Scheduler present, no tests or dev dependencies, no macOS metadata, the packaged header declaring the expected version. Any failure exits non-zero and says the archive is not fit to release.
+
+The build also refuses to start if the plugin header, `FICTION_DRAFTS_VERSION` and `package.json` disagree about the version, so a release cannot report one version while branching on another.
+
+The printed `sha256` identifies the artifact you are about to distribute. It is not reproducible across runs — zip records modification times — so publish the hash of the file you actually ship.
 
 ## Roadmap
 

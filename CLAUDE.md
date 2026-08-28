@@ -74,9 +74,14 @@ composer analyse     # phpstan level 6
 bun run build        # assets/app → build/
 bun run start
 bun run lint:js
+bun run package      # dist/fiction-drafts-<version>.zip, installable via Plugins → Add New
 ```
 
 **bun, never npm or npx.**
+
+`tools/package.ts` builds the release archive. It stages a copy under `dist/staging/` and runs `composer install --no-dev` **there** — never in the working tree, which would silently disarm `composer check` for whoever cut the release. What ships is an allow-list (`SHIPPED`), not an ignore-list, because an ignore-list fails open and this plugin's archives contain the site's secrets. The verification pass re-opens the finished zip and compares it against the repository rather than against the staging directory it just wrote; a check that reads only what the packer produced cannot see what the packer dropped.
+
+Adding a production Composer dependency needs no change here — the vendor checks are derived from `composer.json`. Adding a new top-level file or directory that must ship does: add it to `SHIPPED`, or the archive's top-level assertion fails.
 
 `phpcs.xml.dist`, `phpstan.neon.dist` and `phpunit.xml.dist` are the committed contract. Loosening one to make a change pass is not a fix — the local un-suffixed variants are gitignored precisely so a per-machine override cannot become everyone's gate.
 

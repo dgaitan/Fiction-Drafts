@@ -4,17 +4,17 @@ project: fiction-drafts
 effort: E3
 effort_source: context-override
 phase: complete
-progress: 597/597
+progress: 615/615
 mode: interactive
 started: 2026-08-28T16:05:00Z
-updated: 2026-08-28T23:05:00Z
+updated: 2026-08-28T23:55:00Z
 ---
 
 # ISA — Fiction Drafts
 
 > Project ISA. System of record for the plugin. Sprints operate against it.
 > Spec: `docs/fiction-drafts/about-the-plugin.md` · Plan: `docs/fiction-drafts/development-plan.md`
-> **Active task: Sprint 7 — the secure download endpoint and the security pass.**
+> **Active task: the release packager — a verified, installable distribution zip.**
 
 ## Problem
 
@@ -851,6 +851,27 @@ client renders handed down from PHP rather than restated in JSX, `composer check
 - [x] ISC-588: each backup still gets its own volumes — the control for the batch read
 - [x] ISC-589: the per-entry size projection has one definition; no writer or stage keeps a private copy
 
+**Release packaging — a distributable, installable archive (2026-08-28)**
+
+- [x] ISC-590: `bun run package` exits 0 and writes `dist/fiction-drafts-{version}.zip`
+- [x] ISC-591: the archive has exactly one top-level directory, named `fiction-drafts` — the folder WordPress installs it as
+- [x] ISC-592: `unzip -t` reports the archive structurally sound
+- [x] ISC-593: `vendor/autoload.php` is inside the archive
+- [x] ISC-594: `vendor/woocommerce/action-scheduler/action-scheduler.php` is inside, so background work never waits on another plugin
+- [x] ISC-595: `build/index.js` and `build/index.asset.php` are inside, so the admin screen renders without a build step on the server
+- [x] ISC-596: every `src/` PHP file in the repository has a counterpart in the archive, compared by count against a tree the packer did not write
+- [x] ISC-597: the *extracted* archive's autoloader resolves `FictionDrafts\Plugin` in a bare PHP process with no WordPress present
+- [x] ISC-598: every shipped PHP file outside `vendor/` passes `php -l`
+- [x] ISC-599: Anti: no `tests/` entry ships
+- [x] ISC-600: Anti: `vendor/` holds nothing beyond what `composer.json`'s `require` names — the check is derived from the manifest, so it cannot go stale
+- [x] ISC-601: both production packages are actually present — the control, without which an empty `vendor/` satisfies ISC-600
+- [x] ISC-602: Anti: no `node_modules`, `.git`, `.agents`, `ISA.md`, `CLAUDE.md`, tool config, `assets/` source, or JS lockfile ships
+- [x] ISC-603: Anti: no `.DS_Store` or AppleDouble entry ships
+- [x] ISC-604: Anti: a planted `src/leaked-dump.sql` fails the run and exits 1 — the allow-list is proved by watching it refuse
+- [x] ISC-605: a version disagreement between the plugin header, `FICTION_DRAFTS_VERSION` and `package.json` aborts before anything is staged
+- [x] ISC-606: Anti: the working tree's `vendor/` is untouched by a release build — `composer check` still passes afterwards
+- [x] ISC-607: the header *inside* the archive declares the version the build claimed
+
 ## Test Strategy
 
 | isc | type | check | threshold | tool |
@@ -927,6 +948,11 @@ client renders handed down from PHP rather than restated in JSX, `composer check
 | ISC-473, ISC-474 | command + control | lint file count, then a planted violation | fails then passes | shell |
 | ISC-466 | live census | tables, options, storage dirs, active_plugins after teardown | all zero | scratchpad/sprint6.php |
 
+| ISC-590..596, ISC-599..605, ISC-607 | build | the packer re-opens its own output and asserts against the repository | exit 0, every check OK | bun run package |
+| ISC-597/598 | live | extract elsewhere, resolve classes and lint in a bare PHP process | class_exists true, no syntax errors | php -r / php -l |
+| ISC-604/605 | control | plant a stray dump, then desynchronise the version; both must refuse | exit 1 both times | bun tools/package.ts |
+| ISC-606 | regression | run the full gate after a release build | 635 tests, exit 0 | composer check |
+
 ## Features
 
 | name | description | satisfies | depends_on | parallelizable |
@@ -981,7 +1007,60 @@ client renders handed down from PHP rather than restated in JSX, `composer check
 | CancelCompareAndSwap | StageRunner refuses to advance a job whose status left running | satisfies: [ISC-549] | depends_on: [] | parallelizable: true |
 | SecurityReviewPass | readme rewrite plus the §10 control-by-control walk | satisfies: [ISC-536..547, ISC-550..552] | depends_on: [DownloadHandler] | parallelizable: false |
 
+**Release packaging**
+
+| name | description | satisfies | depends_on | parallelizable |
+|---|---|---|---|---|
+| ReleasePacker | stage an allow-listed copy, install --no-dev there, zip it | satisfies: [ISC-590..596] | depends_on: [] | parallelizable: false |
+| ArchiveVerifier | re-open the finished zip and diff it against the repository | satisfies: [ISC-596..603, ISC-607] | depends_on: [ReleasePacker] | parallelizable: false |
+| VersionGate | refuse to build while the header, the constant and package.json disagree | satisfies: [ISC-605] | depends_on: [] | parallelizable: true |
+
 ## Decisions
+
+### 2026-08-28 — the release archive is staged, allow-listed, and verified from the outside
+
+**Not `git archive`.** `.gitignore` excludes `/vendor/` and `/build/` because both are reproducible
+from lockfiles. That is right for the repository and fatal for a release: a zip of the tracked files
+alone has no autoloader, no bundled Action Scheduler, and no admin bundle. It installs, activates,
+and does nothing — the failure surfaces on someone else's site, which is the worst place to find it.
+
+**Not `composer install --no-dev` in place.** The vendor tree a release needs is not the vendor tree
+the repository needs. Installing in place would delete phpcs, phpstan and phpunit from the working
+tree and silently disarm `composer check` for whoever cut the release; they would find out from CI.
+The plugin is copied to `dist/staging/` and Composer runs there. ISC-606 asserts the working tree
+survived, because the claim is only worth what it is measured by.
+
+**An allow-list, not an ignore-list.** An ignore-list fails open — the day a database dump, an
+`.env`, or a stray archive lands in the plugin root, an ignore-list ships it. For a plugin whose
+entire job is packaging the site's secrets into a file, failing open is not an acceptable default.
+`SHIPPED` names what goes; everything else has to be added deliberately. ISC-604 plants a dump and
+watches the build refuse, because an allow-list nobody has seen refuse is an assumption.
+
+**The checks read the zip, not the staging directory.** Verifying staging only proves the copy step
+agreed with itself — a differential over two artefacts the same code wrote cannot see what is missing
+from both. So the verifier re-opens the finished archive and compares it against the repository,
+counting `src/` PHP files against a tree it did not produce (ISC-596), and the strongest probe
+extracts the archive somewhere else entirely and resolves `FictionDrafts\Plugin` through its own
+autoloader in a bare PHP process (ISC-597).
+
+**Vendor checks are derived from `composer.json`.** Naming the dev packages to exclude would be a
+second list to keep in step with the first, and it would go stale on the first transitive dependency.
+The verifier reads `require` and asserts both directions: nothing outside it ships, and everything
+inside it does (ISC-600 with ISC-601 as its control).
+
+**Three files state the version and nothing reconciles them.** The header is what WordPress displays
+and what an updater compares; `FICTION_DRAFTS_VERSION` is what the code branches on. A release built
+while they disagree reports one version and behaves like another, and the mismatch stays invisible
+until a migration guarded by the constant fails to run. The build refuses to start (ISC-605).
+
+**Show your math — delegation floor.** No agent was spawned. The work is one script against one
+repository whose conventions are already loaded; a delegate would have had to be told everything this
+context already holds, and the verification is mechanical rather than a matter of judgement.
+
+**Not reproducible byte-for-byte, and said so rather than implied.** Zip records modification times,
+so two builds of an identical tree hash differently. Making them identical means normalising mtimes
+and entry order, which is a real project and was not asked for. The printed `sha256` identifies the
+artefact being shipped, and the readme says exactly that instead of letting a reader assume more.
 
 ### 2026-08-28 — readme.txt becomes README.md
 
@@ -2175,3 +2254,27 @@ describes.
 
 ISC-492: the option row is 284 bytes, contains `hash('sha256', $token)`, does not contain the token,
 and `autoload=off` — read straight out of `wp_options` with `$wpdb`.
+
+ISC-590..603, ISC-607: `bun run package` — 30 checks OK, exit 0. `fiction-drafts-0.1.0.zip`,
+0.4 MB across 243 entries, `sha256 e986221b…`. Named checks include "exactly one top-level directory,
+named fiction-drafts", "contains vendor/woocommerce/action-scheduler/action-scheduler.php",
+"vendor/ holds production packages only", "all 76 src/ PHP files are present", and
+"the packaged header declares version 0.1.0".
+
+ISC-597: extracted to a scratch directory outside the repository, then
+`php -r 'require .../vendor/autoload.php; class_exists(...)'` → `FictionDrafts\Plugin resolved`,
+`FictionDrafts\Download\DownloadHandler resolved`, `FictionDrafts\Backup\StageRunner resolved`,
+`FictionDrafts\Rest\BackupsController resolved`, `Psr\Container\ContainerInterface resolved`.
+
+ISC-598: `php -l` across all 79 shipped non-vendor PHP files — no output, no syntax errors.
+
+ISC-604: `printf 'x' > src/leaked-dump.sql` then a build →
+`FAIL no database dumps (found src/leaked-dump.sql)` … `The archive … is NOT fit to release`,
+exit code 1. File removed; the next clean build exits 0.
+
+ISC-605: `package.json` set to `0.1.1` while the header and constant stayed `0.1.0` →
+`Aborted: Version mismatch - refusing to build.` with all three values printed, exit code 1,
+and nothing staged.
+
+ISC-606: `composer check` after a full release build — phpcs clean, phpstan `[OK] No errors`,
+`Tests: 635, Assertions: 2460, Skipped: 2`, exit code 0.
