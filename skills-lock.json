@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "skills": {
+    "accessibility": {
+      "source": "addyosmani/web-quality-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "bffe3d08cfe92ebad63699f74ce29e35c19850ebfbf474c1463183cfe34d6a09"
+    },
+    "bun": {
+      "source": "midudev/autoskills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "1386ed5490ed278e38312a416c9aa074dbe3849f32ae7f841e4142fef5d4df94"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "82fb11a63fb1e35ee2469516ed02d54695f783115b1540c0e783197af4240a3a"
+    },
+    "php-pro": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "a3010d6ac7a48f5d4a79e1b03d28855f223740a03208a35233627ae7ad9e1037"
+    },
+    "seo": {
+      "source": "addyosmani/web-quality-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "c184da724d1c61ad077f27418ea8e7e88fd54bcdf98165e18be7e4681cbd5e20"
+    },
+    "wordpress-router": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "9fa919400b3f566ca749e78ef25c0a7105e4f0706c880b93b39bb238395adb0a"
+    },
+    "wp-block-development": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "41cd56de2724aa8e887cae6a2e546d45e8ee0954f93a94209dab005c005d3ac3"
+    },
+    "wp-block-themes": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "0c94d6a09d32c7935c891f990e79f94156cd8d70446c4bbe1b0b69e1bf402d5e"
+    },
+    "wp-performance": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "c4210ed18f7d32a1fcd2c193e370b215f7cdc2395a83b656c86680468656626e"
+    },
+    "wp-plugin-development": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "2a6eeaa480bf86cdbe938ee3c8704fef94103abfdbb9e5eb6cd9e3793e894f36"
+    },
+    "wp-project-triage": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "b0ebe8dc1195c8726a59696b27d3cb1caacfa0931189dd1f7825a680ffeea9b3"
+    },
+    "wp-rest-api": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "872e17e06555137aed729b8e87f27a35cb4a64c26c41aa619cac9cc67c32103d"
+    },
+    "wp-wpcli-and-ops": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "dd68c01df32e390d833b6d17ba5c94c3151a68edeeaf69248696fd4253cd10b7"
+    }
+  }
+}
