@@ -168,7 +168,7 @@ final class DownloadHandler {
 			return;
 		}
 
-		$path = ( new VolumeNaming( $this->storage->baseDir() ) )->pathFor( $job, $sequence );
+		$path = VolumeNaming::forStorage( $this->storage )->pathFor( $job, $sequence );
 
 		// Gate 6 — containment.
 		if ( ! PathGuard::isContainedFile( $this->storage->baseDir(), $path ) ) {

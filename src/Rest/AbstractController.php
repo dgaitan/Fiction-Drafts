@@ -21,6 +21,15 @@ abstract class AbstractController {
 
 	public const CAPABILITY = 'manage_options';
 
+	/**
+	 * The uuid route fragment, with its capture group.
+	 *
+	 * One copy, because three identical regexes are three chances to relax one
+	 * of them. It is deliberately hex-bound rather than `[\w-]+`: a route that
+	 * accepts any word is a route that hands arbitrary strings to a lookup.
+	 */
+	public const UUID_PATTERN = '(?P<uuid>[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})';
+
 	abstract public function registerRoutes(): void;
 
 	/**
@@ -56,11 +65,24 @@ abstract class AbstractController {
 	 * site's password hashes.
 	 */
 	public static function hasCapability(): bool {
-		if ( is_multisite() ) {
-			return current_user_can( 'manage_network_options' );
-		}
+		return current_user_can( self::capability() );
+	}
 
-		return current_user_can( self::CAPABILITY );
+	/**
+	 * The capability name itself, for the callers that need a string.
+	 *
+	 * `add_menu_page()` takes a capability, not a decision, so `AdminPage`
+	 * cannot call `hasCapability()` — and when it passed the raw
+	 * `manage_options` constant instead, the multisite rule above stopped at
+	 * the REST boundary. A subsite administrator got a visible menu, a
+	 * bootstrap payload saying `canManage: true`, and a 403 from every request
+	 * the screen made. Two answers to one question, which is how the answer
+	 * drifts.
+	 *
+	 * Exposing the name keeps the rule in one place for both kinds of caller.
+	 */
+	public static function capability(): string {
+		return is_multisite() ? 'manage_network_options' : self::CAPABILITY;
 	}
 
 	/**

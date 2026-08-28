@@ -379,4 +379,48 @@ final class BackupsControllerTest extends TestCase {
 	private function request( string $uuid ): WP_REST_Request {
 		return new WP_REST_Request( [ 'uuid' => $uuid ], 'DELETE' );
 	}
+
+	// -------------------------------------------------------- the N+1 on list
+
+	/**
+	 * The list reads the volume ledger once, not once per backup.
+	 *
+	 * `per_page` goes to a hundred and this route is the first thing the screen
+	 * loads, so a per-row query made the first paint a hundred round trips to
+	 * MySQL. The count is asserted rather than the shape, because a batch method
+	 * that loops internally satisfies the interface and keeps the N+1.
+	 */
+	public function testTheLedgerIsReadOncePerPageNotOncePerBackup(): void {
+		foreach ( [ 'a', 'b', 'c', 'd' ] as $index => $letter ) {
+			$this->seedCompleted( sprintf( '%s%s%s%s%s%s%s%s-cccc-4ccc-8ccc-cccccccccc%02d', ...array_merge( array_fill( 0, 8, $letter ), [ $index ] ) ) );
+		}
+
+		$this->volumes->batchReads = 0;
+
+		$backups = $this->index();
+
+		$this->assertCount( 4, $backups, 'the fixture itself must produce four backups' );
+		$this->assertSame( 1, $this->volumes->batchReads );
+	}
+
+	/**
+	 * The control: batching must not have flattened four ledgers into one.
+	 */
+	public function testEachBackupStillGetsItsOwnVolumes(): void {
+		$first  = $this->seedCompleted( 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 1 );
+		$second = $this->seedCompleted( 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 3 );
+
+		$byUuid = [];
+
+		foreach ( $this->index() as $entry ) {
+			$byUuid[ $entry['uuid'] ] = $entry;
+		}
+
+		$this->assertSame( 1, $byUuid[ $first->uuid ]['volume_count'] );
+		$this->assertSame( 3, $byUuid[ $second->uuid ]['volume_count'] );
+
+		foreach ( $byUuid[ $second->uuid ]['volumes'] as $volume ) {
+			$this->assertNotSame( '', $volume['sha256'] );
+		}
+	}
 }

@@ -4,10 +4,10 @@ project: fiction-drafts
 effort: E3
 effort_source: context-override
 phase: complete
-progress: 589/589
+progress: 597/597
 mode: interactive
 started: 2026-08-28T16:05:00Z
-updated: 2026-08-28T22:10:00Z
+updated: 2026-08-28T23:05:00Z
 ---
 
 # ISA — Fiction Drafts
@@ -840,6 +840,17 @@ client renders handed down from PHP rather than restated in JSX, `composer check
 - [x] ISC-580: an injected array still wins over `$_GET`, which is what keeps the other 41 handler tests free of superglobals
 - [x] ISC-581: the `do_action` test double reproduces core's `if ( empty( $arg ) ) { $arg[] = ''; }`, so the suite catches this class of defect without needing an ISC per callback
 
+**Audit — security, performance, and duplication (2026-08-28)**
+
+- [x] ISC-582: `Manifest::read()` refuses a sidecar past `MAX_READ_BYTES` rather than allocating it
+- [x] ISC-583: a real sidecar still reads — the control, without which an unconditional `null` passes ISC-582
+- [x] ISC-584: the ceiling is measured on bytes actually read, not on a prior `filesize()` that a growing file could race
+- [x] ISC-585: a lost `slug()` race adopts the winner's directory instead of resolving a second storage root
+- [x] ISC-586: the menu and the REST gate resolve the same capability, so multisite cannot show a screen whose every request is refused
+- [x] ISC-587: `GET /backups` reads the volume ledger once per page, asserted by call count rather than by result shape
+- [x] ISC-588: each backup still gets its own volumes — the control for the batch read
+- [x] ISC-589: the per-entry size projection has one definition; no writer or stage keeps a private copy
+
 ## Test Strategy
 
 | isc | type | check | threshold | tool |
@@ -1528,6 +1539,13 @@ log file is claimable for its TTL by anyone who can read logs. A POST body would
 be used, because the download is a browser navigation.
 
 ## Changelog
+
+### 2026-08-28 — validated the shape, not the volume
+
+- **conjectured:** the sidecar manifest was handled correctly. Sprint 7 had already established that a file this plugin wrote is still input, and `BackupsController::project()` reduces it to `Manifest::KEYS` with `active_plugins` capped at 500 strings.
+- **refuted by:** an audit sweep asking what an oversized-but-valid sidecar costs. Measured: a 47 MiB manifest peaks at 127 MiB for one `Manifest::read()`, and the list route reads one per backup, up to a hundred per request. The cap existed but ran *after* `json_decode`, which is after the allocation that matters. The result is a fatal on the only screen from which the offending backup can be deleted — the same shape as the WPML failure this site was investigating the same day, where the fatal lands on `plugins.php`.
+- **learned:** validating a shape and bounding a volume are two separate obligations, and having done the first convincingly is what stops anyone asking about the second. A trust boundary is only closed when the refusal happens before the allocation.
+- **criterion now:** ISC-582 requires `Manifest::read()` to refuse past `MAX_READ_BYTES`, ISC-583 is its control (a real sidecar still reads), and ISC-584 pins the boundary at the byte — the read asks for one byte past the ceiling so a file that grows after a `filesize()` cannot pass it.
 
 ### 2026-08-28 — the hook was never fired, only registered
 

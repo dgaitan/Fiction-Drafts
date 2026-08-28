@@ -40,7 +40,6 @@ use WP_REST_Response;
  */
 final class DownloadController extends AbstractController {
 
-	private const UUID_PATTERN = '(?P<uuid>[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})';
 
 	public function __construct(
 		private readonly JobStore $jobs,
@@ -52,7 +51,7 @@ final class DownloadController extends AbstractController {
 	public function registerRoutes(): void {
 		register_rest_route(
 			self::NAMESPACE,
-			'/backups/' . self::UUID_PATTERN . '/download-token',
+			'/backups/' . parent::UUID_PATTERN . '/download-token',
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'issue' ],
@@ -110,7 +109,7 @@ final class DownloadController extends AbstractController {
 		// Checked before a grant is spent rather than after, so a backup whose
 		// files were removed by hand answers honestly instead of handing over a
 		// link that will 404 in five seconds.
-		if ( ! is_file( ( new VolumeNaming( $this->storage->baseDir() ) )->pathFor( $job, $sequence ) ) ) {
+		if ( ! is_file( VolumeNaming::forStorage( $this->storage )->pathFor( $job, $sequence ) ) ) {
 			return $this->error(
 				'fiction_drafts_volume_missing',
 				__( 'That volume is no longer on this server.', 'fiction-drafts' ),

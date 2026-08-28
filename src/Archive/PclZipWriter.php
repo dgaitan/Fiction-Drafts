@@ -31,7 +31,6 @@ final class PclZipWriter implements ArchiveWriter {
 
 	public const FLUSH_EVERY = 200;
 
-	private const ENTRY_OVERHEAD_BYTES = 100;
 
 	private string $path = '';
 
@@ -209,7 +208,7 @@ final class PclZipWriter implements ArchiveWriter {
 
 		++$this->entries;
 
-		$this->pendingBytes += $bytes + self::ENTRY_OVERHEAD_BYTES + ( 2 * strlen( $entryName ) );
+		$this->pendingBytes += EntryFootprint::of( $bytes, $entryName );
 
 		if ( $this->flushEvery > 0 && count( $this->pending ) >= $this->flushEvery ) {
 			$this->flush();

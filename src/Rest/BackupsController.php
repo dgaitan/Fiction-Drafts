@@ -47,7 +47,6 @@ use WP_REST_Response;
  */
 final class BackupsController extends AbstractController {
 
-	private const UUID_PATTERN = '(?P<uuid>[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})';
 
 	public function __construct(
 		private readonly JobStore $jobs,
@@ -78,7 +77,7 @@ final class BackupsController extends AbstractController {
 
 		register_rest_route(
 			self::NAMESPACE,
-			'/backups/' . self::UUID_PATTERN,
+			'/backups/' . parent::UUID_PATTERN,
 			[
 				'methods'             => 'DELETE',
 				'callback'            => [ $this, 'destroy' ],
@@ -95,9 +94,15 @@ final class BackupsController extends AbstractController {
 		$perPage = (int) $request->get_param( 'per_page' );
 		$perPage = min( 100, max( 1, 0 === $perPage ? 20 : $perPage ) );
 
+		$jobs = $this->jobs->all( JobStatus::Completed, $perPage );
+
+		// One ledger read for the page, not one per row. `per_page` goes to a
+		// hundred, and this route is what the screen loads first.
+		$ledger = $this->volumes->allForMany( $jobs );
+
 		$backups = array_map(
-			fn ( BackupJob $job ): array => $this->present( $job ),
-			$this->jobs->all( JobStatus::Completed, $perPage )
+			fn ( BackupJob $job ): array => $this->present( $job, $ledger[ $job->uuid ] ?? [] ),
+			$jobs
 		);
 
 		return $this->respond( [ 'backups' => $backups ] );
@@ -184,10 +189,13 @@ final class BackupsController extends AbstractController {
 	 *
 	 * @return array<string, mixed>
 	 */
-	private function present( BackupJob $job ): array {
-		$volumes  = $this->volumes->allFor( $job );
-		$manifest = $this->manifestFor( $job );
-		$onDisk   = $this->naming()->sequencesFor( $job );
+	/**
+	 * @param array<int, ArchiveVolume> $volumes This job's volumes, already read.
+	 */
+	private function present( BackupJob $job, array $volumes ): array {
+		$naming   = $this->naming();
+		$manifest = $this->manifestFor( $naming, $job );
+		$onDisk   = $naming->sequencesFor( $job );
 
 		return [
 			'uuid'               => $job->uuid,
@@ -232,8 +240,8 @@ final class BackupsController extends AbstractController {
 	 *
 	 * @return array<string, mixed>|null
 	 */
-	private function manifestFor( BackupJob $job ): ?array {
-		$raw = Manifest::read( $this->naming()->manifestPathFor( $job ) );
+	private function manifestFor( VolumeNaming $naming, BackupJob $job ): ?array {
+		$raw = Manifest::read( $naming->manifestPathFor( $job ) );
 
 		return null === $raw ? null : self::project( $raw );
 	}
@@ -316,7 +324,7 @@ final class BackupsController extends AbstractController {
 	}
 
 	private function naming(): VolumeNaming {
-		return new VolumeNaming( $this->storage->baseDir() );
+		return VolumeNaming::forStorage( $this->storage );
 	}
 
 	/**

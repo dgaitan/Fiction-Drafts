@@ -34,6 +34,20 @@ final class VolumeNaming {
 
 	public function __construct( private readonly string $baseDir ) {}
 
+	/**
+	 * The naming for a storage root.
+	 *
+	 * `new VolumeNaming( $this->storage->baseDir() )` appeared in seven files,
+	 * three of which wrapped it in an identical private `naming()` helper. The
+	 * repetition is not the cost — the coupling is: every one of those callers
+	 * had to know that naming is constructed from a base directory, so a
+	 * change to what it needs would have to be made seven times. Naming it once
+	 * here means a caller asks for the naming and is handed one.
+	 */
+	public static function forStorage( \FictionDrafts\Storage\StorageLocator $storage ): self {
+		return new self( $storage->baseDir() );
+	}
+
 	public function filenameFor( BackupJob $job, int $sequence ): string {
 		return sprintf(
 			'fiction-drafts-%s-%s-part%02d.zip',

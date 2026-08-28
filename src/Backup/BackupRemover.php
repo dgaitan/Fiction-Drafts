@@ -70,6 +70,6 @@ final class BackupRemover {
 	}
 
 	private function naming(): VolumeNaming {
-		return new VolumeNaming( $this->storage->baseDir() );
+		return VolumeNaming::forStorage( $this->storage );
 	}
 }

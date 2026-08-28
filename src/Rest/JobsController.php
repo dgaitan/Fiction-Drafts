@@ -24,7 +24,6 @@ use WP_REST_Response;
  */
 final class JobsController extends AbstractController {
 
-	private const UUID_PATTERN = '(?P<uuid>[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})';
 
 	public function __construct(
 		private readonly JobManager $jobs,
@@ -75,7 +74,7 @@ final class JobsController extends AbstractController {
 
 		register_rest_route(
 			self::NAMESPACE,
-			'/jobs/' . self::UUID_PATTERN,
+			'/jobs/' . parent::UUID_PATTERN,
 			[
 				'methods'             => 'GET',
 				'callback'            => [ $this, 'show' ],
@@ -85,7 +84,7 @@ final class JobsController extends AbstractController {
 
 		register_rest_route(
 			self::NAMESPACE,
-			'/jobs/' . self::UUID_PATTERN,
+			'/jobs/' . parent::UUID_PATTERN,
 			[
 				'methods'             => 'DELETE',
 				'callback'            => [ $this, 'cancel' ],

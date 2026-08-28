@@ -149,11 +149,4 @@ final class TableSchema {
 
 		return $this->sortable;
 	}
-
-	/**
-	 * @return array<int, string>
-	 */
-	public function primaryKeyColumns(): array {
-		return $this->primaryKeys;
-	}
 }

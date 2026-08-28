@@ -82,6 +82,10 @@ bun run lint:js
 
 ## Conventions
 
+The full pattern guide — with the failure each rule prevents and a pre-commit
+checklist — is the `fiction-drafts-patterns` skill in `.claude/skills/`. Load it before
+writing or reviewing code here. What follows is the short form.
+
 - PHP 8.1, `declare( strict_types=1 )` in every file, PSR-4 `FictionDrafts\` → `src/`
 - WordPress + WordPress-Extra coding standards; a `phpcs:ignore` needs a reason on the same line
 - Constructor property promotion, `readonly` where the value does not change

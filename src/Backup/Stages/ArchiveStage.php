@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace FictionDrafts\Backup\Stages;
 
 use FictionDrafts\Archive\ArchiveWriterFactory;
+use FictionDrafts\Archive\EntryFootprint;
 use FictionDrafts\Archive\VolumeNaming;
 use FictionDrafts\Backup\Manifest;
 use FictionDrafts\Contracts\ArchiveWriter;
@@ -71,14 +72,6 @@ final class ArchiveStage implements Stage {
 	 */
 	public const DEFAULT_STEP_BYTES = 67108864;
 
-	/**
-	 * Fixed part of a zip entry's overhead: local header, central directory
-	 * record, and the end-of-directory share.  The name is stored twice, so
-	 * the variable part is added per entry — WordPress paths of 150 characters
-	 * are ordinary, and a flat constant underestimates them by more than
-	 * twofold.
-	 */
-	private const ENTRY_OVERHEAD_BYTES = 100;
 
 	/**
 	 * Entries before a volume is sealed regardless of its size.
@@ -234,7 +227,7 @@ final class ArchiveStage implements Stage {
 				$size = filesize( $unit['source'] );
 				$size = false === $size ? 0 : $size;
 
-				$projected = $size + self::ENTRY_OVERHEAD_BYTES + ( 2 * strlen( $unit['name'] ) );
+				$projected = EntryFootprint::of( $size, $unit['name'] );
 
 				// Before the add, never after.  An entry decided into the old
 				// volume and recorded against the new one is the boundary
@@ -398,7 +391,7 @@ final class ArchiveStage implements Stage {
 	}
 
 	private function naming(): VolumeNaming {
-		return new VolumeNaming( $this->storage->baseDir() );
+		return VolumeNaming::forStorage( $this->storage );
 	}
 
 	/**

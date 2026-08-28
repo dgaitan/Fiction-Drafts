@@ -79,7 +79,7 @@ final class AdminPage {
 		$suffix = add_menu_page(
 			__( 'Fiction Drafts', 'fiction-drafts' ),
 			__( 'Fiction Drafts', 'fiction-drafts' ),
-			AbstractController::CAPABILITY,
+			AbstractController::capability(),
 			self::MENU_SLUG,
 			[ $this, 'render' ],
 			'dashicons-backup',
@@ -153,7 +153,7 @@ final class AdminPage {
 		return [
 			'restUrl'   => esc_url_raw( rest_url( AbstractController::NAMESPACE . '/' ) ),
 			'nonce'     => wp_create_nonce( 'wp_rest' ),
-			'canManage' => current_user_can( AbstractController::CAPABILITY ),
+			'canManage' => AbstractController::hasCapability(),
 			'pollMs'    => 2000,
 			'profiles'  => $this->profiles->all(),
 			'stages'    => $this->stageList(),

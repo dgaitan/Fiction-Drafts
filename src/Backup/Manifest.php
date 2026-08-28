@@ -149,16 +149,40 @@ final class Manifest {
 	}
 
 	/**
-	 * @return array<string, mixed>|null Null when absent or unreadable.
+	 * A ceiling on what this will read, in bytes.
+	 *
+	 * A real manifest is under two kilobytes. This is three orders of magnitude
+	 * above that, so it can only ever be reached by a file that is not a
+	 * manifest — a corrupt write, or an edit by anyone with write access to the
+	 * storage directory.
+	 *
+	 * `BackupsController` already treats the sidecar as untrusted and projects
+	 * it through `KEYS`, capping `active_plugins` at 500 strings. That cap runs
+	 * *after* `json_decode`, which is too late to matter: a 47 MiB sidecar of
+	 * perfectly valid JSON peaks at 127 MiB for a single read — measured — and
+	 * the list route reads one per backup, up to a hundred per request. The
+	 * result is a fatal on the only screen from which the offending backup can
+	 * be deleted.
+	 *
+	 * Validating the shape without bounding the volume is half a trust
+	 * boundary. This is the other half.
+	 */
+	public const MAX_READ_BYTES = 1048576;
+
+	/**
+	 * @return array<string, mixed>|null Null when absent, oversized, or unreadable.
 	 */
 	public static function read( string $path ): ?array {
 		if ( ! is_file( $path ) ) {
 			return null;
 		}
 
-		$raw = file_get_contents( $path );
+		// Read one byte past the ceiling rather than trusting a separate
+		// filesize(): the file can grow between the stat and the read, and a
+		// length-limited read cannot be raced into allocating more than this.
+		$raw = file_get_contents( $path, false, null, 0, self::MAX_READ_BYTES + 1 );
 
-		if ( false === $raw ) {
+		if ( false === $raw || strlen( $raw ) > self::MAX_READ_BYTES ) {
 			return null;
 		}
 

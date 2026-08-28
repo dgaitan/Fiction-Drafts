@@ -79,9 +79,25 @@ final class StorageLocator {
 
 		$slug = strtolower( bin2hex( random_bytes( 16 ) ) );
 
-		add_option( self::OPTION_SLUG, $slug, '', false );
+		// `add_option()` is the atomic half — it refuses when the row already
+		// exists, so two requests racing here cannot both write. The half that
+		// was missing is honouring that refusal: whoever loses must adopt the
+		// winner's slug, not carry on with the one it generated. Otherwise two
+		// concurrent activations resolve two different storage directories,
+		// and every archive written to the loser's is invisible to the winner.
+		if ( add_option( self::OPTION_SLUG, $slug, '', false ) ) {
+			return $slug;
+		}
 
-		return $slug;
+		// Past the object cache: the miss above may have populated `notoptions`
+		// in this worker, which would make the row the winner just wrote
+		// invisible to the re-read.
+		wp_cache_delete( self::OPTION_SLUG, 'options' );
+		wp_cache_delete( 'notoptions', 'options' );
+
+		$winner = get_option( self::OPTION_SLUG, null );
+
+		return ( is_string( $winner ) && 32 === strlen( $winner ) ) ? $winner : $slug;
 	}
 
 	/**

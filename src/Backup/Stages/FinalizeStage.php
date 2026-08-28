@@ -84,7 +84,7 @@ final class FinalizeStage implements Stage {
 	 * @throws RuntimeException When the archive produced no volume at all.
 	 */
 	public function run( BackupJob $job, StageCursor $cursor, TimeBudget $budget ): StageResult {
-		$naming     = new VolumeNaming( $this->storage->baseDir() );
+		$naming     = VolumeNaming::forStorage( $this->storage );
 		$sequences  = $naming->sequencesFor( $job );
 		$workingDir = $this->storage->workingDir( $job->uuid );
 

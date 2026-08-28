@@ -52,36 +52,64 @@ final class VolumeRepository implements VolumeStore {
 	 * @return array<int, ArchiveVolume>
 	 */
 	public function allFor( BackupJob $job ): array {
-		if ( null === $job->id ) {
-			return [];
+		return $this->allForMany( [ $job ] )[ $job->uuid ] ?? [];
+	}
+
+	/**
+	 * @param  array<int, BackupJob>                  $jobs Jobs to look up.
+	 * @return array<string, array<int, ArchiveVolume>>
+	 */
+	public function allForMany( array $jobs ): array {
+		$uuidById = [];
+		$volumes  = [];
+
+		foreach ( $jobs as $job ) {
+			$volumes[ $job->uuid ] = [];
+
+			if ( null !== $job->id ) {
+				$uuidById[ $job->id ] = $job->uuid;
+			}
+		}
+
+		if ( [] === $uuidById ) {
+			return $volumes;
 		}
 
 		global $wpdb;
 
 		$table = Migrator::volumesTable();
+		$ids   = array_keys( $uuidById );
+
+		// %d per id rather than an imploded list: the ids are integers from
+		// our own rows, but building an IN clause by concatenation is a habit
+		// that survives into the one place where they are not.
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
 
 		$rows = $wpdb->get_results(
-			$wpdb->prepare( "SELECT * FROM `{$table}` WHERE job_id = %d ORDER BY sequence ASC", $job->id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name from Migrator, never from input.
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- the table name comes from Migrator and the %d placeholders are generated from the id count, so the sniff cannot see them in the literal; every value is still bound.
+			$wpdb->prepare( "SELECT * FROM `{$table}` WHERE job_id IN ({$placeholders}) ORDER BY job_id ASC, sequence ASC", ...$ids ),
 			ARRAY_A
 		);
 
 		if ( ! is_array( $rows ) ) {
-			return [];
+			return $volumes;
 		}
-
-		$volumes = [];
 
 		foreach ( $rows as $row ) {
 			if ( ! is_array( $row ) ) {
 				continue;
 			}
 
-			$filename = (string) ( $row['filename'] ?? '' );
+			$uuid = $uuidById[ (int) ( $row['job_id'] ?? 0 ) ] ?? null;
 
-			$volumes[] = new ArchiveVolume(
-				jobUuid: $job->uuid,
+			if ( null === $uuid ) {
+				continue;
+			}
+
+			$volumes[ $uuid ][] = new ArchiveVolume(
+				jobUuid: $uuid,
 				sequence: (int) ( $row['sequence'] ?? 0 ),
-				filename: $filename,
+				filename: (string) ( $row['filename'] ?? '' ),
 				// The path is derived, never stored.  A stored absolute path
 				// survives a site move and points at nothing; the storage root
 				// plus the filename is correct wherever the site now lives.

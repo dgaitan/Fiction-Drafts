@@ -37,13 +37,6 @@ final class ZipWriter implements ArchiveWriter {
 
 	public const REOPEN_EVERY = 200;
 
-	/**
-	 * Local header, central directory record, and the end-of-directory share.
-	 *
-	 * The name is stored twice, hence the doubling.
-	 */
-	private const ENTRY_OVERHEAD_BYTES = 100;
-
 	private ?ZipArchive $zip = null;
 
 	private string $path = '';
@@ -217,7 +210,7 @@ final class ZipWriter implements ArchiveWriter {
 		++$this->entries;
 		++$this->sinceReopen;
 
-		$this->pendingBytes += $sourceBytes + self::ENTRY_OVERHEAD_BYTES + ( 2 * strlen( $entryName ) );
+		$this->pendingBytes += EntryFootprint::of( $sourceBytes, $entryName );
 
 		if ( $this->reopenEvery > 0 && $this->sinceReopen >= $this->reopenEvery ) {
 			$this->reopen();

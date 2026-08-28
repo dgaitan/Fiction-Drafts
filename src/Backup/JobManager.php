@@ -130,7 +130,7 @@ final class JobManager {
 		// whatever had not been reached yet, and a truncated archive left in
 		// the storage root looks exactly like a finished one to a directory
 		// listing, to the retention sweep, and to whoever downloads it.
-		( new VolumeNaming( $this->storage->baseDir() ) )->removeAllFor( $cancelled );
+		VolumeNaming::forStorage( $this->storage )->removeAllFor( $cancelled );
 
 		return $cancelled;
 	}

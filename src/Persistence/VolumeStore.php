@@ -33,5 +33,22 @@ interface VolumeStore {
 	 */
 	public function allFor( BackupJob $job ): array;
 
+	/**
+	 * Volumes for many jobs at once, keyed by job uuid.
+	 *
+	 * The list route renders up to a hundred backups in one response, and
+	 * calling `allFor()` per job made that a hundred round trips to MySQL for
+	 * a screen that is the first thing the page loads. The rows are one
+	 * `IN (…)` away from each other.
+	 *
+	 * Every uuid asked for appears in the result, mapped to an empty list when
+	 * the job has no volumes — so a caller never has to distinguish "no rows"
+	 * from "not asked".
+	 *
+	 * @param  array<int, BackupJob>                  $jobs Jobs to look up.
+	 * @return array<string, array<int, ArchiveVolume>>
+	 */
+	public function allForMany( array $jobs ): array;
+
 	public function deleteFor( BackupJob $job ): void;
 }

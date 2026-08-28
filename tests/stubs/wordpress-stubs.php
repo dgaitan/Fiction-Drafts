@@ -58,7 +58,8 @@ if ( ! function_exists( 'fiction_drafts_test_reset_hooks' ) ) {
 		// counted how many times an action fired was counting every earlier
 		// test in the class as well — and passed anyway, because it asserted
 		// "at least one".
-		$GLOBALS['fiction_drafts_test_actions'] = [];
+		$GLOBALS['fiction_drafts_test_actions']       = [];
+		$GLOBALS['fiction_drafts_test_option_misses'] = [];
 	}
 }
 
@@ -221,13 +222,14 @@ $GLOBALS['fiction_drafts_test_option_calls'] = [
 
 if ( ! function_exists( 'fiction_drafts_test_reset_options' ) ) {
 	function fiction_drafts_test_reset_options(): void {
-		$GLOBALS['fiction_drafts_test_multisite']    = false;
-		$GLOBALS['fiction_drafts_test_options']      = [];
-		$GLOBALS['fiction_drafts_test_option_calls'] = [
+		$GLOBALS['fiction_drafts_test_multisite']     = false;
+		$GLOBALS['fiction_drafts_test_options']       = [];
+		$GLOBALS['fiction_drafts_test_option_calls']  = [
 			'get'    => 0,
 			'add'    => [],
 			'update' => [],
 		];
+		$GLOBALS['fiction_drafts_test_option_misses'] = [];
 	}
 }
 
@@ -240,6 +242,21 @@ if ( ! function_exists( 'fiction_drafts_test_option_calls' ) ) {
 if ( ! function_exists( 'get_option' ) ) {
 	function get_option( string $option, mixed $default_value = false ): mixed {
 		++$GLOBALS['fiction_drafts_test_option_calls']['get'];
+
+		/*
+		 * A read that misses a row which does exist.
+		 *
+		 * This is what an object cache does under concurrency: worker A's
+		 * `notoptions` entry predates worker B's write, so A is told the option
+		 * is absent while the row is there. Without a way to reproduce it, the
+		 * lost-update branch it causes is unreachable from a test — and code
+		 * that cannot be reached is code that was never checked.
+		 */
+		if ( ! empty( $GLOBALS['fiction_drafts_test_option_misses'][ $option ] ) ) {
+			--$GLOBALS['fiction_drafts_test_option_misses'][ $option ];
+
+			return $default_value;
+		}
 
 		return array_key_exists( $option, $GLOBALS['fiction_drafts_test_options'] )
 			? $GLOBALS['fiction_drafts_test_options'][ $option ]
