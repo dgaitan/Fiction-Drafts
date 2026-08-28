@@ -1,6 +1,10 @@
 ---
 name: fiction-drafts-patterns
-description: The code patterns, invariants, and review checklist for the Fiction Drafts WordPress plugin. Use when writing, reviewing, or refactoring any PHP or JavaScript in this repository, and before opening a pull request.
+description: Use when writing, reviewing, or refactoring any PHP or JavaScript in the Fiction Drafts plugin, and before opening a pull request. Covers the single-source-of-truth rule for shared constants and decisions, bounding untrusted input by size as well as shape, avoiding N+1 reads on list endpoints, keeping test doubles as strict as WordPress core, testing hook wiring through the real dispatcher, lost-update handling around the object cache, the SQL allow-list and prepare() placeholder-escape rule, service-provider wiring, and the pre-commit gate.
+license: GPL-2.0-or-later
+metadata:
+  domain: project
+  applies-to: wp-content/plugins/fiction-drafts
 ---
 
 # Fiction Drafts — code patterns
