@@ -59,7 +59,8 @@ final class AdminPage {
 		private readonly StageRegistry $stages,
 		private readonly ProfileCatalogue $profiles,
 		private readonly SettingsRepository $settings,
-		private readonly string $pluginFile
+		private readonly string $pluginFile,
+		private readonly string $version = ''
 	) {}
 
 	public function register(): void {
@@ -154,6 +155,10 @@ final class AdminPage {
 			'restUrl'   => esc_url_raw( rest_url( AbstractController::NAMESPACE . '/' ) ),
 			'nonce'     => wp_create_nonce( 'wp_rest' ),
 			'canManage' => AbstractController::hasCapability(),
+			// The header banner's version pill — handed in rather than read
+			// from a global constant, the same reason $pluginFile is a
+			// constructor argument and not FICTION_DRAFTS_DIR.
+			'version'   => $this->version,
 			'pollMs'    => 2000,
 			'profiles'  => $this->profiles->all(),
 			'stages'    => $this->stageList(),

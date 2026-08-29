@@ -1,20 +1,39 @@
 // Design tokens for the Fiction Drafts admin SPA.
-// Every colour, space, and type value belongs here — never inline in a component.
+// Every colour, space, and type value belongs here — never inline in a
+// component.
 
 $fd-color-text: #1e1e1e;
+$fd-color-text-secondary: #3c434a;
 $fd-color-muted: #757575;
 $fd-color-surface: #fff;
 $fd-color-surface-alt: #f6f7f7;
 $fd-color-border: #dcdcde;
 $fd-color-accent: #2271b1;
+$fd-color-accent-dark: #135e96;
 $fd-color-warning: #bd8600;
+$fd-color-warning-bg: #fcf3e3;
 $fd-color-danger: #b32d2e;
+$fd-color-danger-bg: #f9e2e2;
+$fd-color-page: #f0f0f1;
+
+// The hero banner's own palette — the plugin's branding, not the admin
+// theme's. Kept apart from $fd-color-accent, which every native WordPress
+// control still uses.
+$fd-color-navy-900: #0b1220;
+$fd-color-navy-800: #12213f;
+$fd-color-navy-700: #1c3a7a;
+$fd-color-rose: #c9184a;
+$fd-color-rose-dark: #a91440;
 
 $fd-space-xs: 4px;
 $fd-space-sm: 8px;
 $fd-space-md: 16px;
 $fd-space-lg: 24px;
+$fd-space-xl: 32px;
 
 $fd-radius: 4px;
-$fd-max-width: 880px;
+$fd-radius-md: 8px;
+$fd-radius-lg: 14px;
+$fd-page-max-width: 1360px;
+$fd-sidebar-width: 300px;
 $fd-bar-height: 20px;

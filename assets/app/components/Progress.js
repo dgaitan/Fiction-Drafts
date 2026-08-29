@@ -14,9 +14,10 @@ import { cancelJob, getJob } from '../api';
  * Statuses after which nothing further will happen.
  *
  * Polling a finished job forever is a request every two seconds for as long as
- * the tab stays open.
+ * the tab stays open. Exported so the Backups tab's in-progress banner can
+ * apply the same rule rather than keeping its own copy.
  */
-const TERMINAL = [ 'completed', 'failed', 'cancelled' ];
+export const TERMINAL = [ 'completed', 'failed', 'cancelled' ];
 
 /**
  * @param {Object} query The react-query Query object.
@@ -98,8 +99,8 @@ export default function Progress() {
 	const isRunning = ! TERMINAL.includes( job.status );
 
 	return (
-		<section className="fd-progress">
-			<h2 className="fd-progress__heading">
+		<section className="fd-card fd-progress">
+			<h2 className="fd-card__title">
 				{ __( 'Backup in progress', 'fiction-drafts' ) }
 			</h2>
 

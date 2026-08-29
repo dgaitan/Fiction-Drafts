@@ -131,6 +131,62 @@ if ( ! function_exists( 'sanitize_text_field' ) ) {
 	}
 }
 
+if ( ! function_exists( 'sanitize_textarea_field' ) ) {
+	function sanitize_textarea_field( string $value ): string {
+		return trim( preg_replace( '/[\t\0\x0B]|<[^>]*>/', '', $value ) ?? '' );
+	}
+}
+
+if ( ! function_exists( 'sanitize_email' ) ) {
+	function sanitize_email( string $value ): string {
+		return trim( preg_replace( '/[^a-zA-Z0-9!#$%&\'*+\/=?^_`{|}~@.\-]/', '', $value ) ?? '' );
+	}
+}
+
+if ( ! function_exists( 'is_email' ) ) {
+	function is_email( string $value ): string|false {
+		return false !== filter_var( $value, FILTER_VALIDATE_EMAIL ) ? $value : false;
+	}
+}
+
+$GLOBALS['fiction_drafts_test_mail'] = [];
+
+if ( ! function_exists( 'fiction_drafts_test_reset_mail' ) ) {
+	function fiction_drafts_test_reset_mail(): void {
+		$GLOBALS['fiction_drafts_test_mail']        = [];
+		$GLOBALS['fiction_drafts_test_mail_result'] = true;
+	}
+}
+
+if ( ! function_exists( 'fiction_drafts_test_set_mail_result' ) ) {
+	function fiction_drafts_test_set_mail_result( bool $result ): void {
+		$GLOBALS['fiction_drafts_test_mail_result'] = $result;
+	}
+}
+
+if ( ! function_exists( 'fiction_drafts_test_sent_mail' ) ) {
+	function fiction_drafts_test_sent_mail(): array {
+		return $GLOBALS['fiction_drafts_test_mail'];
+	}
+}
+
+if ( ! function_exists( 'wp_mail' ) ) {
+	/**
+	 * @param string|array<int, string> $to      One address or several.
+	 * @param string|array<int, string> $headers Raw header lines.
+	 */
+	function wp_mail( string|array $to, string $subject, string $message, string|array $headers = '' ): bool {
+		$GLOBALS['fiction_drafts_test_mail'][] = [
+			'to'      => $to,
+			'subject' => $subject,
+			'message' => $message,
+			'headers' => $headers,
+		];
+
+		return true === ( $GLOBALS['fiction_drafts_test_mail_result'] ?? true );
+	}
+}
+
 if ( ! function_exists( 'absint' ) ) {
 	function absint( mixed $value ): int {
 		return abs( (int) $value );

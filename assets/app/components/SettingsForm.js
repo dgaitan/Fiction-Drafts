@@ -76,106 +76,151 @@ export default function SettingsForm() {
 	}
 
 	return (
-		<form className="fd-settings" onSubmit={ submit }>
-			<h2 className="fd-settings__heading">
+		<section className="fd-card">
+			<h2 className="fd-card__title">
 				{ __( 'Settings', 'fiction-drafts' ) }
 			</h2>
-
-			<SelectControl
-				className="fd-field"
-				label={ __( 'Default profile', 'fiction-drafts' ) }
-				value={ form.default_profile }
-				options={ settings.profiles.map( ( profile ) => ( {
-					label: profile.label,
-					value: profile.slug,
-				} ) ) }
-				onChange={ ( value ) =>
-					setForm( { ...form, default_profile: value } )
-				}
-			/>
-
-			<TextareaControl
-				className="fd-field"
-				label={ __( 'Extra exclusions', 'fiction-drafts' ) }
-				help={ __(
-					'One glob pattern per line, relative to the WordPress root. These are added to the ones every profile already excludes.',
+			<p className="fd-card__subtitle">
+				{ __(
+					'Defaults, exclusions, and volume behaviour for every future backup.',
 					'fiction-drafts'
 				) }
-				value={ form.exclusions }
-				rows={ 8 }
-				onChange={ ( value ) =>
-					setForm( { ...form, exclusions: value } )
-				}
-			/>
+			</p>
 
-			<TextControl
-				className="fd-field"
-				type="number"
-				min={ minMib }
-				label={ __( 'Maximum volume size (MiB)', 'fiction-drafts' ) }
-				help={ sprintf(
-					/* translators: %d: minimum volume size in mebibytes. */
-					__(
-						'Anything below %d MiB is raised to it when saved.',
-						'fiction-drafts'
-					),
-					minMib
-				) }
-				value={ form.max_volume_mib }
-				onChange={ ( value ) =>
-					setForm( { ...form, max_volume_mib: value } )
-				}
-			/>
+			<form className="fd-settings" onSubmit={ submit }>
+				<div className="fd-settings__group">
+					<h3 className="fd-settings__group-title">
+						{ __( 'General', 'fiction-drafts' ) }
+					</h3>
+					<p className="fd-settings__group-desc">
+						{ __(
+							'The profile pre-selected on the New Backup tab.',
+							'fiction-drafts'
+						) }
+					</p>
 
-			<TextControl
-				className="fd-field"
-				type="number"
-				min={ 0 }
-				label={ __( 'Backups to keep', 'fiction-drafts' ) }
-				help={ __(
-					'Older backups beyond this many are deleted automatically. Set it to 0 to keep every backup and manage them yourself.',
-					'fiction-drafts'
-				) }
-				value={ form.retention_count }
-				onChange={ ( value ) =>
-					setForm( { ...form, retention_count: value } )
-				}
-			/>
+					<SelectControl
+						className="fd-field"
+						label={ __( 'Default profile', 'fiction-drafts' ) }
+						value={ form.default_profile }
+						options={ settings.profiles.map( ( profile ) => ( {
+							label: profile.label,
+							value: profile.slug,
+						} ) ) }
+						onChange={ ( value ) =>
+							setForm( { ...form, default_profile: value } )
+						}
+					/>
+				</div>
 
-			{ save.isError && (
-				<Notice
-					className="fd-notice"
-					status="error"
-					isDismissible={ false }
-				>
-					{ save.error && save.error.message
-						? save.error.message
-						: __(
-								'The settings could not be saved.',
+				<div className="fd-settings__group">
+					<h3 className="fd-settings__group-title">
+						{ __( 'Exclusions', 'fiction-drafts' ) }
+					</h3>
+					<p className="fd-settings__group-desc">
+						{ __(
+							'One glob pattern per line, relative to the WordPress root. These are added to the ones every profile already excludes.',
+							'fiction-drafts'
+						) }
+					</p>
+
+					<TextareaControl
+						className="fd-field"
+						label={ __( 'Extra exclusions', 'fiction-drafts' ) }
+						value={ form.exclusions }
+						rows={ 8 }
+						onChange={ ( value ) =>
+							setForm( { ...form, exclusions: value } )
+						}
+					/>
+				</div>
+
+				<div className="fd-settings__group">
+					<h3 className="fd-settings__group-title">
+						{ __( 'Volumes & retention', 'fiction-drafts' ) }
+					</h3>
+					<p className="fd-settings__group-desc">
+						{ __(
+							'How large each archive volume can grow, and how many finished backups to keep.',
+							'fiction-drafts'
+						) }
+					</p>
+
+					<div className="fd-settings__row">
+						<TextControl
+							className="fd-field"
+							type="number"
+							min={ minMib }
+							label={ __(
+								'Maximum volume size (MiB)',
 								'fiction-drafts'
-						  ) }
-				</Notice>
-			) }
+							) }
+							help={ sprintf(
+								/* translators: %d: minimum volume size in mebibytes. */
+								__(
+									'Anything below %d MiB is raised to it when saved.',
+									'fiction-drafts'
+								),
+								minMib
+							) }
+							value={ form.max_volume_mib }
+							onChange={ ( value ) =>
+								setForm( { ...form, max_volume_mib: value } )
+							}
+						/>
 
-			{ save.isSuccess && (
-				<Notice
-					className="fd-notice"
-					status="success"
-					isDismissible={ false }
+						<TextControl
+							className="fd-field"
+							type="number"
+							min={ 0 }
+							label={ __( 'Backups to keep', 'fiction-drafts' ) }
+							help={ __(
+								'Older backups beyond this many are deleted automatically. Set it to 0 to keep every backup and manage them yourself.',
+								'fiction-drafts'
+							) }
+							value={ form.retention_count }
+							onChange={ ( value ) =>
+								setForm( { ...form, retention_count: value } )
+							}
+						/>
+					</div>
+				</div>
+
+				{ save.isError && (
+					<Notice
+						className="fd-notice"
+						status="error"
+						isDismissible={ false }
+					>
+						{ save.error && save.error.message
+							? save.error.message
+							: __(
+									'The settings could not be saved.',
+									'fiction-drafts'
+							  ) }
+					</Notice>
+				) }
+
+				{ save.isSuccess && (
+					<Notice
+						className="fd-notice"
+						status="success"
+						isDismissible={ false }
+					>
+						{ __( 'Settings saved.', 'fiction-drafts' ) }
+					</Notice>
+				) }
+
+				<Button
+					className="fd-settings__submit"
+					variant="primary"
+					type="submit"
+					isBusy={ save.isPending }
+					disabled={ save.isPending }
 				>
-					{ __( 'Settings saved.', 'fiction-drafts' ) }
-				</Notice>
-			) }
-
-			<Button
-				className="fd-settings__submit"
-				variant="primary"
-				type="submit"
-				isBusy={ save.isPending }
-				disabled={ save.isPending }
-			>
-				{ __( 'Save settings', 'fiction-drafts' ) }
-			</Button>
-		</form>
+					{ __( 'Save settings', 'fiction-drafts' ) }
+				</Button>
+			</form>
+		</section>
 	);
 }

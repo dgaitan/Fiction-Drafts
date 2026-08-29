@@ -16,6 +16,7 @@ export const bootstrap = {
 	restUrl: raw.restUrl || '',
 	nonce: raw.nonce || '',
 	canManage: Boolean( raw.canManage ),
+	version: raw.version || '',
 	pollMs: raw.pollMs || 2000,
 	profiles: raw.profiles || [],
 	stages: raw.stages || [],

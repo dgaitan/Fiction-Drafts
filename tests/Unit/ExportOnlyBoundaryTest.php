@@ -29,12 +29,14 @@ final class ExportOnlyBoundaryTest extends TestCase {
 	 *
 	 * `stylesheet` and `active_plugins` are what make a manifest able to say
 	 * what the site was running; `home` is the fallback when `get_home_url()`
-	 * is unavailable, which is the case in unit tests. Nothing here is ever
-	 * written.
+	 * is unavailable, which is the case in unit tests. `admin_email` is where
+	 * FeatureRequestController sends the Feature Request tab's messages — the
+	 * plugin has no mailbox of its own to hardcode, and reading the site's own
+	 * contact address is a read, never a write. Nothing here is ever written.
 	 *
 	 * @var array<int, string>
 	 */
-	private const CORE_OPTIONS_READ = [ 'stylesheet', 'active_plugins', 'home' ];
+	private const CORE_OPTIONS_READ = [ 'stylesheet', 'active_plugins', 'home', 'admin_email' ];
 
 	/**
 	 * Method-name prefixes that would mean the plugin writes site state back.

@@ -37,6 +37,7 @@ final class RestServiceProvider implements ServiceProvider {
 		BackupsController::class,
 		DownloadController::class,
 		SettingsController::class,
+		FeatureRequestController::class,
 	];
 
 	public function register( Container $container ): void {
@@ -79,6 +80,11 @@ final class RestServiceProvider implements ServiceProvider {
 				$c->get( SettingsRepository::class ),
 				$c->get( ProfileCatalogue::class )
 			)
+		);
+
+		$container->singleton(
+			FeatureRequestController::class,
+			static fn (): FeatureRequestController => new FeatureRequestController()
 		);
 	}
 

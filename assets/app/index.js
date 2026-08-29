@@ -10,7 +10,9 @@ import { createRoot } from '@wordpress/element';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 
+import AdvancedBackups from './components/AdvancedBackups';
 import BackupsList from './components/BackupsList';
+import FeatureRequest from './components/FeatureRequest';
 import Layout from './components/Layout';
 import NewBackup from './components/NewBackup';
 import Progress from './components/Progress';
@@ -44,6 +46,14 @@ const App = () => (
 					<Route element={ <NewBackup /> } index />
 					<Route element={ <Progress /> } path="progress/:uuid" />
 					<Route element={ <BackupsList /> } path="backups" />
+					<Route
+						element={ <AdvancedBackups /> }
+						path="advanced-backups"
+					/>
+					<Route
+						element={ <FeatureRequest /> }
+						path="feature-request"
+					/>
 					<Route element={ <SettingsForm /> } path="settings" />
 					{ /* Any hash the app does not own lands here rather than on a
 				     blank screen — a bare href="#" anywhere in WordPress admin

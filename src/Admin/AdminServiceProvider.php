@@ -27,12 +27,21 @@ final class AdminServiceProvider implements ServiceProvider {
 
 		$container->singleton(
 			AdminPage::class,
-			static fn ( Container $c ): AdminPage => new AdminPage(
-				$c->get( StageRegistry::class ),
-				$c->get( ProfileCatalogue::class ),
-				$c->get( SettingsRepository::class ),
-				dirname( __DIR__, 2 ) . '/fiction-drafts.php'
-			)
+			static function ( Container $c ): AdminPage {
+				$pluginFile = dirname( __DIR__, 2 ) . '/fiction-drafts.php';
+
+				return new AdminPage(
+					$c->get( StageRegistry::class ),
+					$c->get( ProfileCatalogue::class ),
+					$c->get( SettingsRepository::class ),
+					$pluginFile,
+					// Read from the header, not FICTION_DRAFTS_VERSION — the same
+					// reason $pluginFile above is computed rather than taken from
+					// FICTION_DRAFTS_DIR: the container has no dependency on the
+					// bootstrap file having defined anything.
+					(string) ( get_file_data( $pluginFile, [ 'Version' => 'Version' ] )['Version'] ?? '' )
+				);
+			}
 		);
 	}
 

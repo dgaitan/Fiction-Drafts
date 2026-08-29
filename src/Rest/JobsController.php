@@ -74,6 +74,16 @@ final class JobsController extends AbstractController {
 
 		register_rest_route(
 			self::NAMESPACE,
+			'/jobs/active',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'active' ],
+				'permission_callback' => [ $this, 'permissionCheck' ],
+			]
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
 			'/jobs/' . parent::UUID_PATTERN,
 			[
 				'methods'             => 'GET',
@@ -139,6 +149,20 @@ final class JobsController extends AbstractController {
 		}
 
 		return $this->respond( $this->present( $job ) );
+	}
+
+	/**
+	 * The queued-or-running job, if there is one.
+	 *
+	 * At most one job is ever active — `JobManager::create()` refuses a second
+	 * one while the first is not terminal — so this is the one thing the
+	 * Backups tab needs to know to offer a link back to it, without the client
+	 * having to already know a uuid to ask for.
+	 */
+	public function active(): WP_REST_Response {
+		$job = $this->jobs->active();
+
+		return $this->respond( [ 'job' => null === $job ? null : $this->present( $job ) ] );
 	}
 
 	/**

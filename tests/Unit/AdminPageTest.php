@@ -57,7 +57,8 @@ final class AdminPageTest extends TestCase {
 			$this->stages,
 			new ProfileCatalogue(),
 			new SettingsRepository(),
-			dirname( __DIR__, 2 ) . '/fiction-drafts.php'
+			dirname( __DIR__, 2 ) . '/fiction-drafts.php',
+			'0.1.0'
 		);
 	}
 
@@ -208,6 +209,10 @@ final class AdminPageTest extends TestCase {
 			$this->assertNotSame( '', $stage['label'] );
 			$this->assertNotSame( $stage['id'], $stage['label'] );
 		}
+	}
+
+	public function testTheVersionComesFromTheConstructorNotAGlobal(): void {
+		$this->assertSame( '0.1.0', $this->page->bootstrap()['version'] );
 	}
 
 	public function testTheWpConfigWarningComesFromTheServer(): void {

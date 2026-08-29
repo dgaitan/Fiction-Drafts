@@ -39,6 +39,15 @@ export function getJob( uuid ) {
 }
 
 /**
+ * The queued-or-running job, if there is one — at most one ever is.
+ *
+ * @return {Promise<Object>} `{ job: null | {...} }`.
+ */
+export function getActiveJob() {
+	return apiFetch( { url: url( 'jobs/active' ) } );
+}
+
+/**
  * @param {string} uuid Job identifier.
  * @return {Promise<Object>} The cancelled job.
  */
@@ -94,4 +103,17 @@ export function getSettings() {
  */
 export function saveSettings( body ) {
 	return apiFetch( { url: url( 'settings' ), method: 'PUT', data: body } );
+}
+
+/**
+ * @param {Object} body `{ name, email, type, message }` from the Feature
+ *                      Request form. `name` and `type` are optional.
+ * @return {Promise<Object>} `{ sent: true }`.
+ */
+export function sendFeatureRequest( body ) {
+	return apiFetch( {
+		url: url( 'feature-request' ),
+		method: 'POST',
+		data: body,
+	} );
 }

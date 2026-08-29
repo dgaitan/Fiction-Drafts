@@ -1,133 +1,355 @@
-@use 'variables' as *;
+@use "variables" as *;
 
 .fd-app {
-	background: $fd-color-surface;
-	border: 1px solid $fd-color-border;
-	border-radius: $fd-radius;
-	color: $fd-color-text;
-	margin-top: $fd-space-lg;
-	max-width: $fd-max-width;
-	padding: $fd-space-lg;
-
-	&__title {
-		margin: 0 0 $fd-space-md;
-	}
-
-	&__body {
-		margin-top: $fd-space-lg;
-	}
-}
-
-.fd-nav {
-	border-bottom: 1px solid $fd-color-border;
 	display: flex;
-	gap: $fd-space-md;
+	flex-direction: column;
+	gap: $fd-space-lg;
+	margin: $fd-space-lg $fd-space-lg $fd-space-xl;
+	max-width: $fd-page-max-width;
+}
 
-	&__link {
-		border-bottom: 2px solid transparent;
-		color: $fd-color-muted;
-		display: inline-block;
-		padding: $fd-space-sm 0;
-		text-decoration: none;
+// Icons — sized by modifier only. Colour always comes from `currentColor`,
+// so an icon inherits whatever text colour surrounds it.
+.fd-icon {
+	block-size: 16px;
+	flex-shrink: 0;
+	inline-size: 16px;
 
-		&--active {
-			border-bottom-color: $fd-color-accent;
-			color: $fd-color-accent;
-			font-weight: 600;
-		}
+	&--xs {
+		block-size: 12px;
+		inline-size: 12px;
+	}
+
+	&--sm {
+		block-size: 14px;
+		inline-size: 14px;
+	}
+
+	&--lg {
+		block-size: 18px;
+		inline-size: 18px;
+	}
+
+	&--xl {
+		block-size: 26px;
+		inline-size: 26px;
 	}
 }
 
-.fd-new {
-	&__legend {
-		font-weight: 600;
-		margin-bottom: $fd-space-sm;
-	}
-
-	&__profiles,
-	&__areas {
-		border: 0;
-		margin: 0 0 $fd-space-lg;
-		padding: 0;
-	}
-
-	&__wp-config {
-		background: $fd-color-surface-alt;
-		border-left: 4px solid $fd-color-warning;
-		margin-bottom: $fd-space-lg;
-		padding: $fd-space-md;
-	}
-}
-
-.fd-profile {
-	align-items: flex-start;
+// The top banner: logo, name, tagline, and the author byline.
+.fd-hero {
+	align-items: center;
+	background: linear-gradient(135deg, $fd-color-navy-900 0%, $fd-color-navy-800 55%, $fd-color-navy-700 100%);
+	border-radius: $fd-radius-lg;
+	color: $fd-color-surface;
 	display: flex;
-	gap: $fd-space-sm;
-	margin-bottom: $fd-space-sm;
+	gap: $fd-space-lg;
+	justify-content: space-between;
+	padding: $fd-space-xl calc($fd-space-xl + $fd-space-sm);
 
-	&__body {
+	&__brand {
+		align-items: flex-start;
+		display: flex;
+		gap: $fd-space-lg;
+	}
+
+	&__logo {
+		block-size: 56px;
+		border-radius: $fd-radius-md;
+		display: block;
+		flex-shrink: 0;
+		inline-size: 56px;
+	}
+
+	&__intro {
 		display: flex;
 		flex-direction: column;
 	}
 
-	&__label {
-		font-weight: 600;
-	}
-
-	&__description {
-		color: $fd-color-muted;
-	}
-}
-
-.fd-bar {
-	appearance: none;
-	block-size: $fd-bar-height;
-	border: 1px solid $fd-color-border;
-	border-radius: $fd-radius;
-	inline-size: 100%;
-}
-
-.fd-progress {
-	&__stage {
-		font-weight: 600;
+	&__titlerow {
+		align-items: center;
+		display: flex;
+		gap: $fd-space-sm;
 		margin-bottom: $fd-space-sm;
 	}
 
-	&__percent,
-	&__counts {
-		color: $fd-color-muted;
-		margin: $fd-space-xs 0;
+	&__title {
+		color: $fd-color-surface;
+		font-size: 26px;
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		margin: 0;
+	}
+
+	&__tagline {
+		color: #c7d2e8;
+		font-size: 15px;
+		inline-size: 100%;
+		line-height: 1.5;
+		margin: 0 0 $fd-space-sm;
+		max-inline-size: 560px;
+	}
+
+	&__note {
+		align-items: center;
+		color: #93a8d6;
+		display: flex;
+		font-size: 13px;
+		gap: $fd-space-sm;
+	}
+
+	&__author {
+		align-items: center;
+		display: flex;
+		flex-shrink: 0;
+		gap: $fd-space-sm;
+	}
+
+	&__authortext {
+		color: #93a8d6;
+		display: flex;
+		flex-direction: column;
+		font-size: 12px;
+		gap: 3px;
+	}
+
+	&__authorlink {
+		align-items: center;
+		color: #bcd2ff;
+		display: inline-flex;
+		font-weight: 600;
+		gap: 4px;
+
+		&:hover {
+			color: $fd-color-surface;
+		}
 	}
 }
 
-.fd-table {
-	border-collapse: collapse;
-	inline-size: 100%;
+.fd-pill {
+	background: rgb(255 255 255 / 12%);
+	border: 1px solid rgb(255 255 255 / 18%);
+	border-radius: 999px;
+	color: #c7d2e8;
+	display: inline-flex;
+	font-size: 12px;
+	font-weight: 600;
+	padding: 3px $fd-space-sm;
+}
 
-	th,
-	&__cell {
-		border-bottom: 1px solid $fd-color-border;
-		padding: $fd-space-sm;
-		text-align: start;
-		vertical-align: top;
+.fd-avatar {
+	align-items: center;
+	background: rgb(255 255 255 / 14%);
+	block-size: 32px;
+	border: 1px solid rgb(255 255 255 / 22%);
+	border-radius: 50%;
+	color: $fd-color-surface;
+	display: flex;
+	flex-shrink: 0;
+	font-size: 12px;
+	font-weight: 700;
+	inline-size: 32px;
+	justify-content: center;
+
+	&--contact {
+		background: $fd-color-navy-800;
+		block-size: 36px;
+		border: 0;
+		font-size: 13px;
+		inline-size: 36px;
+	}
+}
+
+// Section navigation, refined from a plain underline row into a set of
+// icon-and-label tabs.
+.fd-nav {
+	background: $fd-color-surface;
+	border: 1px solid $fd-color-border;
+	border-radius: $fd-radius-md;
+	box-shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 4px 12px rgb(0 0 0 / 5%);
+	display: flex;
+	gap: $fd-space-xs;
+	padding: 6px;
+}
+
+.fd-tab {
+	align-items: center;
+	border-radius: $fd-radius;
+	color: $fd-color-text-secondary;
+	display: flex;
+	font-size: 14px;
+	font-weight: 500;
+	gap: $fd-space-sm;
+	padding: $fd-space-sm $fd-space-md;
+	text-decoration: none;
+
+	&:hover {
+		background: $fd-color-surface-alt;
+	}
+
+	&--active {
+		background: #e7f0fa;
+		color: $fd-color-accent;
+		font-weight: 600;
+	}
+}
+
+// The two-column body: whatever route is active, plus the donate widget.
+.fd-layout {
+	align-items: flex-start;
+	display: flex;
+	gap: $fd-space-lg;
+}
+
+.fd-main {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: $fd-space-lg;
+	min-inline-size: 0;
+}
+
+.fd-sidebar {
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 0;
+	gap: $fd-space-lg;
+	inline-size: $fd-sidebar-width;
+}
+
+// A route's own content — the card every tab renders into.
+.fd-card {
+	background: $fd-color-surface;
+	border: 1px solid $fd-color-border;
+	border-radius: $fd-radius-md;
+	box-shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 4px 12px rgb(0 0 0 / 5%);
+	padding: $fd-space-lg;
+
+	&__header {
+		align-items: center;
+		display: flex;
+		gap: $fd-space-md;
+		justify-content: space-between;
+		margin-bottom: $fd-space-md;
+	}
+
+	&__title {
+		font-size: 17px;
+		font-weight: 600;
+		margin: 0;
+	}
+
+	&__subtitle {
+		color: $fd-color-muted;
+		font-size: 13px;
+		margin: 4px 0 0;
+	}
+}
+
+// The donate widget, the one thing every tab's sidebar shows.
+.fd-widget {
+	background: $fd-color-surface;
+	border: 1px solid $fd-color-border;
+	border-radius: $fd-radius-md;
+	box-shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 4px 12px rgb(0 0 0 / 5%);
+	padding: 22px;
+
+	&__icon {
+		align-items: center;
+		background: #fde7ee;
+		block-size: 36px;
+		border-radius: $fd-radius;
+		color: $fd-color-rose;
+		display: flex;
+		inline-size: 36px;
+		justify-content: center;
+		margin-bottom: $fd-space-sm;
+	}
+
+	&__title {
+		font-size: 15px;
+		font-weight: 700;
+		margin: 0 0 6px;
+	}
+
+	&__body {
+		color: $fd-color-text-secondary;
+		font-size: 13px;
+		line-height: 1.55;
+		margin: 0 0 $fd-space-md;
+	}
+
+	&__button.components-button {
+		background: $fd-color-rose;
+		border: 0;
+		color: $fd-color-surface;
+		inline-size: 100%;
+		justify-content: center;
+
+		&:hover:not(:disabled) {
+			background: $fd-color-rose-dark;
+			color: $fd-color-surface;
+		}
+	}
+}
+
+// A plain button used outside @wordpress/components — a `Link` styled as a
+// button, or a genuinely disabled `<button>` (WP's own `Button` renders
+// `disabled` with its own affordance, which "Coming soon" cards intentionally
+// do not want to borrow).
+.fd-button {
+	align-items: center;
+	border-radius: $fd-radius;
+	display: inline-flex;
+	font-size: 14px;
+	font-weight: 600;
+	gap: $fd-space-sm;
+	line-height: 1.4;
+	padding: $fd-space-sm $fd-space-md;
+	text-decoration: none;
+
+	&--secondary {
+		background: $fd-color-surface;
+		border: 1px solid $fd-color-border;
+		color: $fd-color-text;
+
+		&:hover {
+			background: $fd-color-surface-alt;
+			color: $fd-color-text;
+		}
+	}
+
+	&--disabled {
+		background: $fd-color-surface-alt;
+		border: 1px solid $fd-color-border;
+		color: #a7aaad;
+		cursor: not-allowed;
+		inline-size: 100%;
+		justify-content: center;
 	}
 }
 
 .fd-badge {
-	border-radius: $fd-radius;
-	display: inline-block;
+	border-radius: 999px;
+	display: inline-flex;
 	font-size: 11px;
+	font-weight: 600;
 	margin-inline-start: $fd-space-xs;
-	padding: 2px $fd-space-xs;
+	padding: 3px 9px;
 
-	&--secret {
-		background: $fd-color-danger;
-		color: $fd-color-surface;
+	&--muted {
+		background: $fd-color-surface-alt;
+		color: $fd-color-muted;
 	}
 
-	&--missing {
-		background: $fd-color-warning;
-		color: $fd-color-surface;
+	&--danger {
+		background: $fd-color-danger-bg;
+		color: $fd-color-danger;
+	}
+
+	&--warning {
+		background: $fd-color-warning-bg;
+		color: $fd-color-warning;
 	}
 }
 
@@ -143,9 +365,76 @@
 	margin: $fd-space-md 0;
 }
 
-.fd-field {
-	margin-bottom: $fd-space-md;
-	max-width: 480px;
+// The backups table.
+.fd-table {
+	border-collapse: collapse;
+	inline-size: 100%;
+
+	th {
+		background: $fd-color-surface-alt;
+		border-bottom: 1px solid $fd-color-border;
+		color: $fd-color-muted;
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		padding: 10px $fd-space-sm;
+		text-align: start;
+		text-transform: uppercase;
+	}
+
+	&__cell {
+		border-bottom: 1px solid $fd-color-border;
+		font-size: 13.5px;
+		padding: $fd-space-sm $fd-space-sm;
+		text-align: start;
+		vertical-align: middle;
+
+		&--mono {
+			color: $fd-color-text-secondary;
+			font-variant-numeric: tabular-nums;
+		}
+	}
+
+	&__row:last-child &__cell {
+		border-bottom: 0;
+	}
+}
+
+.fd-profile-tag {
+	align-items: center;
+	display: flex;
+	gap: $fd-space-sm;
+}
+
+// A profile's colour, derived from what it copies — see
+// `BackupsList.js#profileDotClass`. Every colour here is a plain accent, not
+// a semantic one (danger/warning stay in `.fd-badge`), so mismatching a dot
+// to the wrong profile is a cosmetic slip, never a misleading warning.
+.fd-dot {
+	block-size: 8px;
+	border-radius: 50%;
+	flex-shrink: 0;
+	inline-size: 8px;
+
+	&--all {
+		background: $fd-color-accent;
+	}
+
+	&--custom {
+		background: $fd-color-muted;
+	}
+
+	&--db {
+		background: #8250df;
+	}
+
+	&--files {
+		background: #bf5b04;
+	}
+
+	&--files-lean {
+		background: #0a7a2f;
+	}
 }
 
 .fd-confirm {
@@ -162,12 +451,328 @@
 }
 
 .fd-download {
+	align-items: flex-start;
 	display: flex;
 	flex-direction: column;
 	gap: $fd-space-xs;
-	align-items: flex-start;
 }
 
 .fd-download__button {
 	white-space: nowrap;
+}
+
+// The Backups tab's own "in progress" card. `GET /jobs/active` returns at
+// most one job, so this renders a list of zero or one rather than a single
+// fixed row — see `InProgressBackups.js`.
+.fd-active-jobs {
+	border-color: $fd-color-accent;
+
+	&__list {
+		display: flex;
+		flex-direction: column;
+		gap: $fd-space-md;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+}
+
+.fd-active-job {
+	background: $fd-color-surface-alt;
+	border-radius: $fd-radius-md;
+	display: flex;
+	flex-direction: column;
+	gap: $fd-space-sm;
+	padding: $fd-space-md;
+
+	&__top {
+		align-items: center;
+		display: flex;
+		gap: $fd-space-sm;
+		justify-content: space-between;
+	}
+
+	&__label {
+		align-items: center;
+		display: flex;
+		gap: $fd-space-sm;
+	}
+
+	&__icon {
+		color: $fd-color-accent;
+	}
+
+	&__name {
+		font-weight: 600;
+	}
+
+	&__stage {
+		color: $fd-color-muted;
+		font-size: 12.5px;
+	}
+
+	&__percent {
+		color: $fd-color-muted;
+		font-size: 12.5px;
+		font-variant-numeric: tabular-nums;
+	}
+
+	&__link {
+		align-self: flex-start;
+	}
+}
+
+// New backup: the profile picker and the wp-config opt-in.
+.fd-new {
+
+	&__legend {
+		font-weight: 600;
+		margin-bottom: $fd-space-sm;
+	}
+
+	&__profiles,
+	&__areas {
+		border: 0;
+		margin: 0 0 $fd-space-lg;
+		padding: 0;
+	}
+
+	&__submit {
+		margin-top: $fd-space-sm;
+	}
+}
+
+.fd-profiles {
+	display: grid;
+	gap: $fd-space-sm;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.fd-profile {
+	align-items: flex-start;
+	border: 1.5px solid $fd-color-border;
+	border-radius: $fd-radius-md;
+	display: flex;
+	gap: $fd-space-sm;
+	padding: $fd-space-md;
+
+	&--selected {
+		background: #f3f8fd;
+		border-color: $fd-color-accent;
+	}
+
+	&__radio {
+		margin-top: 3px;
+	}
+
+	&__body {
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__label {
+		font-weight: 600;
+	}
+
+	&__description {
+		color: $fd-color-muted;
+		font-size: 12.5px;
+	}
+}
+
+.fd-callout {
+	background: $fd-color-warning-bg;
+	border: 1px solid #f3dfab;
+	border-inline-start: 4px solid $fd-color-warning;
+	border-radius: $fd-radius-md;
+	margin-bottom: $fd-space-lg;
+	padding: $fd-space-md;
+}
+
+// Advanced Backups: the two "coming soon" destination cards.
+.fd-destinations {
+	display: grid;
+	gap: $fd-space-md;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	margin-bottom: $fd-space-md;
+
+	&__footnote {
+		color: $fd-color-muted;
+		font-size: 13px;
+		margin: 0;
+		text-align: center;
+	}
+}
+
+.fd-dest {
+	border: 1.5px solid $fd-color-border;
+	border-radius: $fd-radius-md;
+	display: flex;
+	flex-direction: column;
+	gap: $fd-space-md;
+	padding: 22px;
+
+	&__top {
+		align-items: flex-start;
+		display: flex;
+		justify-content: space-between;
+	}
+
+	&__icon {
+		align-items: center;
+		background: #e6f0fd;
+		block-size: 44px;
+		border-radius: $fd-radius-md;
+		color: $fd-color-accent;
+		display: flex;
+		inline-size: 44px;
+		justify-content: center;
+	}
+
+	&__name {
+		font-size: 15px;
+		font-weight: 700;
+		margin-bottom: 2px;
+	}
+
+	&__desc {
+		color: $fd-color-text-secondary;
+		font-size: 13px;
+		line-height: 1.5;
+	}
+}
+
+// Feature Request: the form and the direct-contact aside beside it.
+.fd-request {
+	align-items: flex-start;
+	display: flex;
+	gap: $fd-space-lg;
+
+	&__form {
+		flex: 1 1 auto;
+		min-inline-size: 0;
+	}
+
+	&__row {
+		display: grid;
+		gap: $fd-space-md;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	&__submit {
+		margin-top: $fd-space-xs;
+	}
+}
+
+.fd-contact {
+	background: $fd-color-surface-alt;
+	border: 1px solid $fd-color-border;
+	border-radius: $fd-radius-md;
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 0;
+	gap: $fd-space-sm;
+	inline-size: 260px;
+	padding: $fd-space-md;
+
+	&__title {
+		color: $fd-color-muted;
+		font-size: 13px;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+	}
+
+	&__person {
+		align-items: center;
+		display: flex;
+		gap: $fd-space-sm;
+	}
+
+	&__name {
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	&__link {
+		font-size: 12.5px;
+	}
+
+	&__text {
+		color: $fd-color-text-secondary;
+		font-size: 12.5px;
+		line-height: 1.55;
+		margin: 0;
+	}
+}
+
+.fd-field {
+	margin-bottom: $fd-space-md;
+	max-width: 480px;
+}
+
+// Settings, grouped into named cards rather than one long form.
+.fd-settings {
+	display: flex;
+	flex-direction: column;
+	gap: $fd-space-md;
+
+	&__group {
+		background: $fd-color-surface;
+		border: 1px solid $fd-color-border;
+		border-radius: $fd-radius-md;
+		padding: $fd-space-lg;
+	}
+
+	&__group-title {
+		font-size: 14px;
+		font-weight: 700;
+		margin: 0 0 4px;
+	}
+
+	&__group-desc {
+		color: $fd-color-muted;
+		font-size: 12.5px;
+		margin: 0 0 $fd-space-md;
+	}
+
+	&__row {
+		display: grid;
+		gap: $fd-space-md;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	&__row .fd-field {
+		max-width: none;
+	}
+
+	&__submit {
+		align-self: flex-start;
+	}
+}
+
+.fd-bar {
+	appearance: none;
+	block-size: $fd-bar-height;
+	border: 1px solid $fd-color-border;
+	border-radius: $fd-radius;
+	inline-size: 100%;
+
+	&--sm {
+		block-size: 10px;
+	}
+}
+
+.fd-progress {
+
+	&__stage {
+		font-weight: 600;
+		margin: $fd-space-md 0 $fd-space-sm;
+	}
+
+	&__percent,
+	&__counts {
+		color: $fd-color-muted;
+		margin: $fd-space-xs 0;
+	}
 }
